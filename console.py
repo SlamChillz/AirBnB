@@ -153,19 +153,6 @@ class HBNBCommand(cmd.Cmd):
         )
 
 
-    def __checkModel(self, args):
-        """
-        Checks for a valid model
-
-        Attr:
-            arg (list): list of args
-
-        Raises:
-            Exceptions: with the right messages
-        """
-        if args[0] not in self.__classes:
-            raise Exception('** class doesn\'t exist **')
-
     def __validateArgs(self, query, args):
         """
         Validates given parameters
