@@ -120,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
         Return:
             (dict): a dictionary of all items in the database
         """
-        from model import storage
+        from models import storage
         objs = storage.all()
         return objs
 
