@@ -5,7 +5,8 @@ A module that defines a class FileStorage for database engine
 """
 
 import json
-
+from ..user import User
+from ..base_model import BaseModel
 
 class FileStorage:
     """
@@ -34,14 +35,16 @@ class FileStorage:
             obj (BaseModel): instance obj
         """
         key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        self.__objects[key] = obj.to_dict()
+        self.__objects[key] = obj
 
     def save(self):
         """
         Serializes __objects to the JSON file (path: __file_path)
         """
+        objs = self.__objects
+        objs = {k: v.to_dict() for k, v in objs.items()}
         with open(self.__file_path, mode='w', encoding='utf-8') as j_file:
-            j_file.write(json.dumps(self.__objects))
+            j_file.write(json.dumps(objs))
 
     def reload(self):
         """
@@ -49,7 +52,10 @@ class FileStorage:
         """
         try:
             with open(self.__file_path, mode='r', encoding='utf-8') as j_file:
-                content = j_file.read()
-            self.__objects.update(json.loads(content))
+                data = j_file.read()
+            data = json.loads(data)
+            for value in data.values():
+                Clazz = eval(value['__class__'])
+                self.new(Clazz(**value))
         except FileNotFoundError:
             pass

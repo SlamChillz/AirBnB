@@ -4,9 +4,12 @@
 A module that defines the command line interpreter for AirBnB project
 """
 
-from models.base_model import BaseModel
-from models import storage
+import re
 import cmd
+import shlex
+from models import storage
+from models.base_model import BaseModel
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
@@ -15,8 +18,30 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = '(hbnb) '
     __classes = {
-        'BaseModel': BaseModel
+        'BaseModel': BaseModel,
+        'User': User
     }
+
+    def parseline(self, line):
+        """Parse the line into a command name and a string containing
+        the arguments.  Returns a tuple containing (command, args, line).
+        'command' and 'args' may be None if the line couldn't be parsed.
+        """
+        line = self.__parseline(line)
+        line = line.strip()
+        if not line:
+            return None, None, line
+        elif line[0] == '?':
+            line = 'help ' + line[1:]
+        elif line[0] == '!':
+            if hasattr(self, 'do_shell'):
+                line = 'shell ' + line[1:]
+            else:
+                return None, None, line
+        i, n = 0, len(line)
+        while i < n and line[i] in self.identchars: i = i+1
+        cmd, arg = line[:i], line[i:].strip()
+        return cmd, arg, line
 
     def do_create(self, arg):
         """Creates an instance of `BaseModel`
@@ -28,7 +53,6 @@ class HBNBCommand(cmd.Cmd):
             return (print(invalid))
         newBaseModel = self.__classes[args[0]]
         new = newBaseModel()
-        new.save()
         print(new.id)
 
     def do_show(self, arg):
@@ -39,13 +63,12 @@ class HBNBCommand(cmd.Cmd):
             arg (str): string of arguments
         """
         args = self.__filter(arg)
-        print(args)
         invalid = self.__validateArgs('show', args)
         if invalid:
             return (print(invalid))
         key = '.'.join(args[:2])
-        obj = storage.all()
-        obj = self.__convert(obj.get(key, None))
+        objs = storage.all()
+        obj = objs.get(key, None)
         if (obj):
             return print(obj)
         print('** no instance found **')
@@ -82,11 +105,31 @@ class HBNBCommand(cmd.Cmd):
             if invalid:
                 return (print(invalid))
             model = args[0]
-        obList = [v for v in (storage.all()).values()]
+        obList = [str(v) for v in (storage.all()).values()]
         if model:
-            obList = list(filter(lambda o: o['__class__'] == model, obList))
-        objs = list(map(lambda o: self.__convert(o), obList))
-        print(objs)
+            match = '[{}]'.format(model)
+            obList = list(filter(lambda s: s.startswith(match), obList))
+        print(obList)
+
+    def __updateMePlease(self, obj, args):
+        """
+        Checks if update inputs are valid
+
+        Attr:
+            obj (BaseModel): instance to be updated
+            args (list): list of passed arguments
+
+        Return:
+            (str): error message
+            (None): if no parameters are valid and all set
+        """ 
+        if not obj:
+            return ('** no instance found **')
+        if len(args) < 3:
+            return ('** attribute name missing **')
+        if len(args) < 4:
+            return ('** value missing **')
+        return None
 
     def do_update(self, arg):
         """
@@ -103,33 +146,12 @@ class HBNBCommand(cmd.Cmd):
         key = '.'.join(args[:2])
         objs = storage.all()
         obj = objs.get(key, None)
-        if not obj:
-            return (print('** no instance found **'))
-        if len(args) < 3:
-            return (print('** attribute name missing **'))
-        if len(args) < 4:
-            return (print('** value missing **'))
-        obj.update({args[2]: args[3]})
-        objs.update({key: obj})
-        storage.save()
+        no = self.__updateMePlease(obj, args)
+        if no:
+            return print(no) # gotyah!!! LMAO
+        setattr(obj, args[2], args[3]) # sad face, I get you for mind.
+        obj.save()
 
-
-
-    def __convert(self, dictionary):
-        """
-        Attr:
-            model (str): name of the model
-            dictionary (dict): dictionary of instance values
-
-        Return:
-            (str): string representation
-        """
-        if dictionary is not None:
-            model = dictionary['__class__']
-            Model = self.__classes[model]
-            return str(Model(**dictionary))
-        return None
- 
     def do_quit(self, arg):
         """Quit command to exit the program
         """
@@ -144,14 +166,7 @@ class HBNBCommand(cmd.Cmd):
         """
         Converts arguments to a valid list that can be worked with
         """
-        sep = ' '
-        count = arg.count('"')
-        if count and (not count%2):
-            sep = '"'
-        return list(
-            filter(lambda s: s.split(), arg.strip().split(sep))
-        )
-
+        return shlex.split(arg) 
 
     def __validateArgs(self, query, args):
         """
@@ -176,6 +191,26 @@ class HBNBCommand(cmd.Cmd):
                 return ('** instance id missing **')
         return None
 
+    def __parseline(self, line):
+        """
+        Parse command formats like `<Model>.<action>(<*args>)`
+        to native formats
+        """
+        newLine = line.strip()
+        args = re.search(r'\(.*?\)', newLine)
+        if args is not None:
+            newargs = re.search(r'"(.+?)*"', args.group())
+            action = shlex.split(
+                newLine[:args.span()[0]]
+            )[0].split(".")
+            if len(action) == 2:
+                if newargs is not None:
+                    newargs = " ".join(newargs.group().split(", "))
+                    line = "{} {} {}".format(action[1], action[0], newargs)
+                else:
+                    line = "{} {}".format(action[1], action[0])
+        return line
+        
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()

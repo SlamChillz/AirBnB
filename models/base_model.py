@@ -4,9 +4,9 @@
 A module that defines a BaseModel class
 """
 
-from datetime import datetime
-from models import storage
+import models
 from uuid import uuid4
+from datetime import datetime
 
 
 class BaseModel:
@@ -33,7 +33,7 @@ class BaseModel:
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
             """Write new obj to json file"""
-            storage.new(self)
+            models.storage.new(self)
 
     def __str__(self):
         """
@@ -51,9 +51,10 @@ class BaseModel:
         Updates instance 'update_at' to the current datetime
         """
         self.updated_at = datetime.now()
-
+        """Updates FileStorage private storage object"""
+        models.storage.new(self)
         """Calls 'storage' save method"""
-        storage.save()
+        models.storage.save()
 
     def __format_time(self, time):
         """
