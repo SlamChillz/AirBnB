@@ -6,10 +6,11 @@ A module that defines the command line interpreter for AirBnB project
 
 import re
 import cmd
+import json
 import shlex
 from models import storage
-from models.base_model import BaseModel
 from models.user import User
+from models.base_model import BaseModel
 
 
 class HBNBCommand(cmd.Cmd):
@@ -28,32 +29,19 @@ class HBNBCommand(cmd.Cmd):
         'command' and 'args' may be None if the line couldn't be parsed.
         """
         line = self.__parseline(line)
-        line = line.strip()
-        if not line:
-            return None, None, line
-        elif line[0] == '?':
-            line = 'help ' + line[1:]
-        elif line[0] == '!':
-            if hasattr(self, 'do_shell'):
-                line = 'shell ' + line[1:]
-            else:
-                return None, None, line
-        i, n = 0, len(line)
-        while i < n and line[i] in self.identchars: i = i+1
-        cmd, arg = line[:i], line[i:].strip()
-        return cmd, arg, line
+        return super().parseline(line)
 
     def do_create(self, arg):
         """Creates an instance of `BaseModel`
         Usage: create BaseModel
         """
-        args = self.__filter(arg)
-        invalid = self.__validateArgs('create', args)
-        if invalid:
-            return (print(invalid))
-        newBaseModel = self.__classes[args[0]]
-        new = newBaseModel()
-        print(new.id)
+        args = shlex.split(arg)
+        self.__validateArgs('create', args)
+        if len(args) > 0 and args[0] in self.__classes:
+            newBaseModel = self.__classes[args[0]]
+            new = newBaseModel()
+            storage.save()
+            print(new.id)
 
     def do_show(self, arg):
         """
@@ -62,16 +50,11 @@ class HBNBCommand(cmd.Cmd):
         Attr:
             arg (str): string of arguments
         """
-        args = self.__filter(arg)
-        invalid = self.__validateArgs('show', args)
-        if invalid:
-            return (print(invalid))
-        key = '.'.join(args[:2])
-        objs = storage.all()
-        obj = objs.get(key, None)
-        if (obj):
-            return print(obj)
-        print('** no instance found **')
+        args = shlex.split(arg)
+        result = self.__validateArgs('show', args)
+        if type(result) == list:
+            [objs, key] = result 
+            print(objs.get(key, ''))
 
     def do_destroy(self, arg):
         """
@@ -80,17 +63,14 @@ class HBNBCommand(cmd.Cmd):
         Attr:
             arg (str): string of arguments
         """
-        args = self.__filter(arg)
-        invalid = self.__validateArgs('destroy', args)
-        if invalid:
-            return (print(invalid))
-        key = '.'.join(args[:2])
-        objs = storage.all()
-        if objs.pop(key, None):
-            return (storage.save())
-        print("** no instance found **")
+        args = shlex.split(arg)
+        result = self.__validateArgs('destroy', args)
+        if type(result) == list:
+            [objs, key] = result
+            objs.pop(key, None)
+            storage.save()
 
-    def do_all(self, arg):
+    def __all(self, arg):
         """
         Prints all string representation of 
         all instances based or not on the class name
@@ -98,18 +78,31 @@ class HBNBCommand(cmd.Cmd):
         Attr:
             arg (str): string or arguments
         """
-        args = self.__filter(arg)
+        args = shlex.split(arg)
         model = None
         if len(args) > 0:
-            invalid = self.__validateArgs('all', args)
-            if invalid:
-                return (print(invalid))
+            if not (self.__classes.get(args[0], None)):
+                return print('** class doesn\'t exist **')
             model = args[0]
         obList = [str(v) for v in (storage.all()).values()]
         if model:
             match = '[{}]'.format(model)
             obList = list(filter(lambda s: s.startswith(match), obList))
-        print(obList)
+        return (obList)
+
+    def do_all(self, arg):
+        """
+        Prints all instances
+        """
+        hall = self.__all(arg)
+        if hall is not None: print(hall)
+
+    def do_count(self, arg):
+        """
+        Returns count of a given model
+        """
+        count = self.__all(arg)
+        if count is not None: print(len(count)) 
 
     def __updateMePlease(self, obj, args):
         """
@@ -122,35 +115,39 @@ class HBNBCommand(cmd.Cmd):
         Return:
             (str): error message
             (None): if no parameters are valid and all set
-        """ 
-        if not obj:
-            return ('** no instance found **')
-        if len(args) < 3:
-            return ('** attribute name missing **')
-        if len(args) < 4:
-            return ('** value missing **')
-        return None
+        """
+        args = (args).replace("'", '"')
+        params = json.loads(args)
+        for key, value in params.items():
+            if key == "None":
+                return print('** attribute name missing **')
+            if value == "None":
+                return print('** value missing **')
+            setattr(obj, key, value)
+        obj.save()
 
     def do_update(self, arg):
         """
-         Updates an instance based on the class name and id by adding or
-         updating attribute 
+        Updates an instance based on the class name and id by adding or
+        updating attribute 
 
-         Attr:
+        Attr:
             arg (str): string or arguments
         """
-        args = self.__filter(arg)
-        invalid = self.__validateArgs('update', args)
-        if invalid:
-            return (print(invalid))
-        key = '.'.join(args[:2])
-        objs = storage.all()
+        args = shlex.split(arg)
+        result = self.__validateArgs('update', args)
+        if type(result) != list:
+            return
+        [objs, key] = result
+        newargs = args + ['None', 'None', 'None']
+        [three, four] = newargs[2:4]
+        if three.startswith('{') and three.endswith('}'):
+            newargs[2] = three
+        else:
+            four = four if four.isnumeric() else '"{}"'.format(four)
+            newargs[2] = '{"' + three + '": ' + four + '}'
         obj = objs.get(key, None)
-        no = self.__updateMePlease(obj, args)
-        if no:
-            return print(no) # gotyah!!! LMAO
-        setattr(obj, args[2], args[3]) # sad face, I get you for mind.
-        obj.save()
+        self.__updateMePlease(obj, newargs[2])
 
     def do_quit(self, arg):
         """Quit command to exit the program
@@ -161,12 +158,6 @@ class HBNBCommand(cmd.Cmd):
         """Exits the interpreter
         """
         return True
-
-    def __filter(self, arg):
-        """
-        Converts arguments to a valid list that can be worked with
-        """
-        return shlex.split(arg) 
 
     def __validateArgs(self, query, args):
         """
@@ -180,15 +171,19 @@ class HBNBCommand(cmd.Cmd):
             None: on valid inputs
             (str): on invalid inputs
         """
-        actions = ['all', 'create', 'destroy', 'show', 'update']
+        actions = ['create', 'destroy', 'show', 'update']
         if len(args) < 1:
-            if query != actions[0]:
-                return ('** class name missing **')
+            return print('** class name missing **')
         if not (self.__classes.get(args[0], None)):
-            return ('** class doesn\'t exist **')
-        if query in actions[2:]:
+            return print('** class doesn\'t exist **')
+        if query in actions[1:]:
             if len(args) < 2:
-                return ('** instance id missing **')
+                return print('** instance id missing **')
+            key = '.'.join(args[:2])
+            objs = storage.all()
+            if objs.get(key, None):
+                return [objs, key]
+            return print('** no instance found **')
         return None
 
     def __parseline(self, line):
@@ -199,16 +194,21 @@ class HBNBCommand(cmd.Cmd):
         newLine = line.strip()
         args = re.search(r'\(.*?\)', newLine)
         if args is not None:
-            newargs = re.search(r'"(.+?)*"', args.group())
-            action = shlex.split(
-                newLine[:args.span()[0]]
-            )[0].split(".")
+            params = args.group().strip('()')
+            curls = re.search(r'\{(.*?)\}', params)
+            if curls:
+                items = curls.group()
+                try:
+                    uid = shlex.split(params[:curls.span()[0]])[0].strip(",")
+                except IndexError:
+                    uid = ""
+                newargs = '{} \'{}\''.format(uid, items.replace("'", '"'))
+            else:
+                newargs = params.split(',')
+                newargs = " ".join(newargs) or ""
+            action = shlex.split(newLine[:args.span()[0]])[0].split(".")
             if len(action) == 2:
-                if newargs is not None:
-                    newargs = " ".join(newargs.group().split(", "))
-                    line = "{} {} {}".format(action[1], action[0], newargs)
-                else:
-                    line = "{} {}".format(action[1], action[0])
+                line = "{} {} {}".format(action[1], action[0], newargs.strip())
         return line
         
 
