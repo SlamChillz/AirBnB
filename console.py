@@ -53,7 +53,7 @@ class HBNBCommand(cmd.Cmd):
         args = shlex.split(arg)
         result = self.__validateArgs('show', args)
         if type(result) == list:
-            [objs, key] = result 
+            [objs, key] = result
             print(objs.get(key, ''))
 
     def do_destroy(self, arg):
@@ -72,7 +72,7 @@ class HBNBCommand(cmd.Cmd):
 
     def __all(self, arg):
         """
-        Prints all string representation of 
+        Prints all string representation of
         all instances based or not on the class name
 
         Attr:
@@ -95,14 +95,16 @@ class HBNBCommand(cmd.Cmd):
         Prints all instances
         """
         hall = self.__all(arg)
-        if hall is not None: print(hall)
+        if hall is not None:
+            print(hall)
 
     def do_count(self, arg):
         """
         Returns count of a given model
         """
         count = self.__all(arg)
-        if count is not None: print(len(count)) 
+        if count is not None:
+            print(len(count))
 
     def __updateMePlease(self, obj, args):
         """
@@ -129,7 +131,7 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """
         Updates an instance based on the class name and id by adding or
-        updating attribute 
+        updating attribute
 
         Attr:
             arg (str): string or arguments
@@ -210,7 +212,7 @@ class HBNBCommand(cmd.Cmd):
             if len(action) == 2:
                 line = "{} {} {}".format(action[1], action[0], newargs.strip())
         return line
-        
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
