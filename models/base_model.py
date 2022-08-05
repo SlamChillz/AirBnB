@@ -13,6 +13,7 @@ class BaseModel:
     """
     Defines all common attribute/methods for other classes
     """
+
     def __init__(self, *args, **kwargs):
         """
         Instantiation method for class instances
@@ -56,15 +57,6 @@ class BaseModel:
         """Calls 'storage' save method"""
         models.storage.save()
 
-    def __format_time(self, time):
-        """
-        Converts datetime object to "%Y-%m-%dT%H:%M:%S.%f"
-
-        Return:
-            time object
-        """
-        return time.strftime("%Y-%m-%dT%H:%M:%S.%f")
-
     def to_dict(self):
         """
         Return:
@@ -72,7 +64,7 @@ class BaseModel:
             keys/values of __dict__ of the instance
         """
         dictionary = self.__dict__.copy()
-        dictionary['created_at'] = self.__format_time(dictionary['created_at'])
-        dictionary['updated_at'] = self.__format_time(dictionary['updated_at'])
+        dictionary['created_at'] = self.created_at.isoformat()
+        dictionary['updated_at'] = self.updated_at.isoformat()
         dictionary['__class__'] = self.__class__.__name__
         return dictionary
