@@ -10,24 +10,22 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
-"""Models imports"""
 from models.user import User
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
-
+from console import HBNBCommand as CMD
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 """Add parent dir to sys path"""
 sys.path.append(parent_dir)
 
-from console import HBNBCommand as CMD
-
 
 class TestCreateCommand(unittest.TestCase):
     """
     Tests for create command
     """
+
     def setUp(self):
         """Reset storage object"""
         FileStorage._FileStorage__objects = {}
@@ -99,4 +97,6 @@ class TestShowCommand(unittest.TestCase):
     """
     Test show command
     """
-    def setUp(self)
+
+    def setUp(self):
+        """"""
