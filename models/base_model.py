@@ -53,7 +53,7 @@ class BaseModel:
         """
         self.updated_at = datetime.now()
         """Updates FileStorage private storage object"""
-        # models.storage.new(self)
+        models.storage.new(self)
         """Calls 'storage' save method"""
         models.storage.save()
 
