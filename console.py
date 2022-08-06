@@ -120,8 +120,9 @@ class HBNBCommand(cmd.Cmd):
                 return print('** attribute name missing **')
             if value == "None":
                 return print('** value missing **')
-            setattr(obj, key, value)
-        obj.save()
+            if len(key) > 0:
+                setattr(obj, key, value)
+                obj.save()
 
     def do_update(self, arg):
         """usage: update <Model> <id> <field> <value>
