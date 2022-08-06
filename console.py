@@ -32,8 +32,8 @@ class HBNBCommand(cmd.Cmd):
         return super().parseline(line)
 
     def do_create(self, arg):
-        """Creates an instance of `BaseModel`
-        Usage: create BaseModel
+        """usage: create <Model>
+        Creates an instance of Model
         """
         args = shlex.split(arg)
         self.__validateArgs('create', args)
@@ -44,11 +44,8 @@ class HBNBCommand(cmd.Cmd):
             print(new.id)
 
     def do_show(self, arg):
-        """
-        Shows string representation of a class id given
-
-        Attr:
-            arg (str): string of arguments
+        """usage: show <Model> <id>
+        Shows an obj of type Model with id
         """
         args = shlex.split(arg)
         result = self.__validateArgs('show', args)
@@ -57,11 +54,8 @@ class HBNBCommand(cmd.Cmd):
             print(objs.get(key, ''))
 
     def do_destroy(self, arg):
-        """
-        Deletes an instance based on the class name and id
-
-        Attr:
-            arg (str): string of arguments
+        """usage: destroy <Model> <id>
+        Deletes an obj of type Model with id
         """
         args = shlex.split(arg)
         result = self.__validateArgs('destroy', args)
@@ -71,10 +65,8 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
 
     def __all(self, arg):
-        """
-        Prints all string representation of
+        """Prints all string representation of
         all instances based or not on the class name
-
         Attr:
             arg (str): string or arguments
         """
@@ -91,32 +83,29 @@ class HBNBCommand(cmd.Cmd):
         return (obList)
 
     def do_all(self, arg):
-        """
-        Prints all instances
+        """usage: all [Model] | <Model>.all()
+        Prints all instances (of Model only if specified)
         """
         hall = self.__all(arg)
         if hall is not None:
             print(hall)
 
     def do_count(self, arg):
-        """
-        Returns count of a given model
+        """usage: <Model>.count()
+        Prints the number of instances of Model
         """
         count = self.__all(arg)
         if count is not None:
             print(len(count))
 
     def __updateMePlease(self, obj, args):
-        """
-        Checks if update inputs are valid
-
+        """Checks if update inputs are valid
         Attr:
             obj (BaseModel): instance to be updated
             args (list): list of passed arguments
-
         Return:
             (str): error message
-            (None): if no parameters are valid and all set
+            (None): if no parameters are valid and all set.
         """
         args = (args).replace("'", '"')
         params = json.loads(args)
@@ -129,12 +118,9 @@ class HBNBCommand(cmd.Cmd):
         obj.save()
 
     def do_update(self, arg):
-        """
-        Updates an instance based on the class name and id by adding or
-        updating attribute
-
-        Attr:
-            arg (str): string or arguments
+        """usage: update <Model> <id> <field> <value>
+        or <Model>.update(<id>, ["<field>", "<value>] | [{<field>: <value>}])
+        Updates field to value of an obj of type Model with id
         """
         args = shlex.split(arg)
         result = self.__validateArgs('update', args)
@@ -152,23 +138,18 @@ class HBNBCommand(cmd.Cmd):
         self.__updateMePlease(obj, newargs[2])
 
     def do_quit(self, arg):
-        """Quit command to exit the program
-        """
+        """Quit command to exit the program"""
         return True
 
     def do_EOF(self, arg):
-        """Exits the interpreter
-        """
+        """Exits the interpreter"""
         return True
 
     def __validateArgs(self, query, args):
-        """
-        Validates given parameters
-
+        """Validates given parameters
         Attr:
             query (str): action to be performed
             args (list): list of parameters
-
         Return:
             None: on valid inputs
             (str): on invalid inputs
@@ -189,9 +170,8 @@ class HBNBCommand(cmd.Cmd):
         return None
 
     def __parseline(self, line):
-        """
-        Parse command formats like `<Model>.<action>(<*args>)`
-        to native formats
+        """Parse command like:
+        <Model>.<action>([[*args], [**kwargs]]) to native formats
         """
         newLine = line.strip()
         args = re.search(r'\(.*?\)', newLine)
