@@ -43,8 +43,8 @@ class BaseModel:
         Return:
             (str): string representation of model instance
         """
-        return "[{:s}] ({:s}) {:s}".format(
-            self.__class__.__name__, self.id, str(self.__dict__)
+        return "[{0}] ({1}) {2}".format(
+            self.__class__.__name__, self.id, self.__dict__
         )
 
     def save(self):
