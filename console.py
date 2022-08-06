@@ -31,6 +31,12 @@ class HBNBCommand(cmd.Cmd):
         line = self.__parseline(line)
         return super().parseline(line)
 
+    def emptyline(self):
+        """Overrides parent method
+        Prevents the execution of the last command, on empty line input
+        """
+        pass
+
     def do_create(self, arg):
         """usage: create <Model>
         Creates an instance of Model
