@@ -136,37 +136,37 @@ class TestShowCommand(unittest.TestCase):
         expected = "** instance id missing **\n"
         output = self.output("show User")
         self.assertEqual(output, expected)
-    
+
     def test_with_user_model_without_id(self):
         """test with User model no id"""
         expected = "** instance id missing **\n"
         output = self.output("show BaseModel")
         self.assertEqual(output, expected)
-    
+
     def test_with_city_model_without_id(self):
         """test with City model no id"""
         expected = "** instance id missing **\n"
         output = self.output("show City")
         self.assertEqual(output, expected)
-    
+
     def test_with_state_model_without_id(self):
         """test with State model no id"""
         expected = "** instance id missing **\n"
         output = self.output("show State")
         self.assertEqual(output, expected)
-    
+
     def test_with_place_model_without_id(self):
         """test with Place model no id"""
         expected = "** instance id missing **\n"
         output = self.output("show Place")
         self.assertEqual(output, expected)
-    
+
     def test_with_review_model_without_id(self):
         """test with Review model no id"""
         expected = "** instance id missing **\n"
         output = self.output("show Review")
         self.assertEqual(output, expected)
-    
+
     def test_with_amenity_model_without_id(self):
         """test with Amenity model no id"""
         expected = "** instance id missing **\n"
@@ -214,7 +214,7 @@ class TestShowCommand(unittest.TestCase):
         output = (self.output(cmd)).strip('\n')
         expected = str(user)
         self.assertEqual(output, expected)
-    
+
     def test_with_base_model_valid_id(self):
         base = BaseModel()
         cmd = "show BaseModel {}".format(base.id)
