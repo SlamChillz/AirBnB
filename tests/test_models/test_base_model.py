@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-This module is designed to test square.py
+This module is designed to test the base model
 """
 import unittest
 import os
