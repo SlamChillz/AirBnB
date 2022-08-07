@@ -6,6 +6,11 @@ A module that defines a class FileStorage for database engine
 
 import json
 from models.user import User
+from models.city import City
+from models.state import State
+from models.place import Place
+from models.review import Review
+from models.amenity import Amenity
 from models.base_model import BaseModel
 
 
@@ -37,6 +42,10 @@ class FileStorage:
         """
         key = "{:s}.{:s}".format(obj.__class__.__name__, obj.id)
         self.__objects[key] = obj
+
+    def clean(self):
+        """Resets the private __object to an empty dictionary"""
+        self.__objects = {}
 
     def save(self):
         """
