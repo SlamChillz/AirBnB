@@ -50,6 +50,7 @@ class TestConsole(unittest.TestCase):
     def test_empty_line(self):
         """test empty line"""
         with patch("sys.stdout", new=StringIO()) as f:
+            CMD().onecmd("")
             self.assertEqual(f.getvalue().strip(), "")
 
 
