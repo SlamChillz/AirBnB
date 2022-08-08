@@ -66,82 +66,79 @@ class TestFileStorage(unittest.TestCase):
         """
         Test the FileStorage class new method
         """
-        with patch('models.base_model.uuid4') as mock_id:
-            mock_id.return_value = str(
-                uuid.UUID("b6a6e15c-c67d-4312-9a75-9d084935e579"))
-            b = BaseModel()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = BaseModel()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = User()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = User()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = City()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = City()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = State()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = State()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = Place()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = Place()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = Amenity()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = Amenity()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            b = Review()
-            storage.new(b)
-            key = "{:s}.{:s}".format(
-                b.__class__.__name__, "b6a6e15c-c67d-4312-9a75-9d084935e579")
-            store = storage.all()
-            self.assertIn(key, store)
-            self.assertEqual(store[key], b)
-            self.assertEqual(type(store[key]), type(b))
+        b = Review()
+        storage.new(b)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        store = storage.all()
+        self.assertIn(key, store)
+        self.assertEqual(store[key], b)
+        self.assertEqual(type(store[key]), type(b))
 
-            with self.assertRaises(AttributeError):
-                storage.new(2)
-            with self.assertRaises(AttributeError):
-                storage.new('foo')
-            with self.assertRaises(TypeError):
-                storage.new()
-            with self.assertRaises(TypeError):
-                storage.new(2, 'foo')
-            with self.assertRaises(AttributeError):
-                storage.new(None)
+        with self.assertRaises(AttributeError):
+            storage.new(2)
+        with self.assertRaises(AttributeError):
+            storage.new('foo')
+        with self.assertRaises(TypeError):
+            storage.new()
+        with self.assertRaises(TypeError):
+            storage.new(2, 'foo')
+        with self.assertRaises(AttributeError):
+            storage.new(None)
 
     def test_save(self):
         """
