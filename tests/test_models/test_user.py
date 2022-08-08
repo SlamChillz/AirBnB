@@ -21,6 +21,9 @@ class TestUser(unittest.TestCase):
         """
         Test the UserModel class
         """
+        b = User()
+        self.assertIsInstance(b, models.base_model.BaseModel)
+        self.assertTrue(issubclass(type(b), models.base_model.BaseModel))
         with patch('models.base_model.uuid4') as mock_id:
             mock_id.return_value = str(
                 uuid.UUID("b6a6e15c-c67d-4312-9a75-9d084935e579"))
@@ -117,7 +120,7 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(AttributeError):
             print(b2.updated_at)
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @ patch('sys.stdout', new_callable=StringIO)
     def test_str(self, stdout):
         """
         Test the User class __str__ method
@@ -202,6 +205,27 @@ class TestUser(unittest.TestCase):
             base.to_dict(2)
         with self.assertRaises(TypeError):
             base.to_dict('foo')
+
+    def test_attrib(self):
+        """
+        Test the User class public attributes
+        """
+        b = User()
+        self.assertTrue(hasattr(b, 'email'))
+        self.assertEqual(b.email, "")
+        self.assertEqual(type(b.email), str)
+
+        self.assertTrue(hasattr(b, 'password'))
+        self.assertEqual(b.password, "")
+        self.assertEqual(type(b.password), str)
+
+        self.assertTrue(hasattr(b, 'first_name'))
+        self.assertEqual(b.first_name, "")
+        self.assertEqual(type(b.first_name), str)
+
+        self.assertTrue(hasattr(b, 'last_name'))
+        self.assertEqual(b.last_name, "")
+        self.assertEqual(type(b.last_name), str)
 
     @staticmethod
     def write_file(filename):
