@@ -4,7 +4,7 @@ This module is designed to test the base model
 """
 import unittest
 from unittest.mock import patch
-from models.engine.file_storage import FileStorage
+from models import storage
 import os
 from datetime import datetime
 from io import StringIO
@@ -25,13 +25,12 @@ class TestFileStorage(unittest.TestCase):
     """
 
     def setUp(self):
-        FileStorage._FileStorage__objects = {}
+        storage._FileStorage__objects = {}
 
     def test_all(self):
         """
         Test the FileStorage class all method
         """
-        storage = FileStorage()
         self.assertEqual(storage.all(), {})
         b = BaseModel()
         u = User()
@@ -48,7 +47,6 @@ class TestFileStorage(unittest.TestCase):
         """
         Test the FileStorage class new method
         """
-        storage = FileStorage()
         with patch('models.base_model.uuid4') as mock_id:
             mock_id.return_value = str(
                 uuid.UUID("b6a6e15c-c67d-4312-9a75-9d084935e579"))
@@ -131,7 +129,6 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class save method
         """
         PATH = 'file.json'
-        storage = FileStorage()
         with patch('models.base_model.uuid4') as mock_id:
             with patch('models.base_model.datetime') as mock_date:
                 mock_id.return_value = str(
@@ -195,7 +192,6 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class save method
         """
         PATH = 'file.json'
-        storage = FileStorage()
         b = BaseModel()
         u = User()
         c = City()
