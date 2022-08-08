@@ -3,13 +3,9 @@
 This module is designed to test the base model
 """
 import unittest
-from unittest.mock import patch
 from models import storage
 import os
-from datetime import datetime
 from models.engine.file_storage import FileStorage
-import models.base_model
-import uuid
 from models.user import User
 from models.city import City
 from models.state import State
@@ -145,58 +141,38 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class save method
         """
         PATH = 'file.json'
-        with patch('models.base_model.uuid4') as mock_id:
-            with patch('models.base_model.datetime') as mock_date:
-                mock_id.return_value = str(
-                    uuid.UUID("788f5f32-d874-4387-872c-e925314ba80a"))
-                mock_date.now.return_value = datetime(
-                    2022, 8, 7, 19, 2, 19, 10000)
-                mock_date.side_effect = lambda *args, **kw: datetime(
-                    *args, **kw)
-                b = BaseModel()
-                u = User()
-                c = City()
-                s = State()
-                p = Place()
-                a = Amenity()
-                r = Review()
-                storage.save()
-                self.assertEqual(os.path.isfile(
-                    PATH) and os.access(PATH, os.R_OK), True)
-                cont = self.write_file(PATH)
-                expected = ('{"BaseModel.788f5f32-d874-4387-872c-e925314ba80a"'
-                            ': {"id": "788f5f32-d874-4387-872c-e925314ba80a", '
-                            '"created_at": "2022-08-07T19:02:19.010000", '
-                            '"updated_at": "2022-08-07T19:02:19.010000", '
-                            '"__class__": "BaseModel"}, '
-                            '"User.788f5f32-d874-4387-872c-e925314ba80a": '
-                            '{"id": "788f5f32-d874-4387-872c-e925314ba80a", '
-                            '"created_at": "2022-08-07T19:02:19.010000", '
-                            '"updated_at": "2022-08-07T19:02:19.010000", '
-                            '"__class__": "User"}, "City.788f5f32-d874-4387-'
-                            '872c-e925314ba80a": {"id": "788f5f32-d874-4387-'
-                            '872c-e925314ba80a", "created_at": "2022-08-07T19:'
-                            '02:19.010000", "updated_at": "2022-08-07T19:02:'
-                            '19.010000", "__class__": "City"}, "State.788f5f32'
-                            '-d874-4387-872c-e925314ba80a": {"id": "788f5f32-'
-                            'd874-4387-872c-e925314ba80a", "created_at": "2022'
-                            '-08-07T19:02:19.010000", "updated_at": "2022-08-'
-                            '07T19:02:19.010000", "__class__": "State"}, '
-                            '"Place.788f5f32-d874-4387-872c-e925314ba80a": '
-                            '{"id": "788f5f32-d874-4387-872c-e925314ba80a", '
-                            '"created_at": "2022-08-07T19:02:19.010000", '
-                            '"updated_at": "2022-08-07T19:02:19.010000", '
-                            '"__class__": "Place"}, "Amenity.788f5f32-d874-'
-                            '4387-872c-e925314ba80a": {"id": "788f5f32-d874'
-                            '-4387-872c-e925314ba80a", "created_at": "2022-'
-                            '08-07T19:02:19.010000", "updated_at": "2022-08-'
-                            '07T19:02:19.010000", "__class__": "Amenity"}, '
-                            '"Review.788f5f32-d874-4387-872c-e925314ba80a": '
-                            '{"id": "788f5f32-d874-4387-872c-e925314ba80a", '
-                            '"created_at": "2022-08-07T19:02:19.010000", '
-                            '"updated_at": "2022-08-07T19:02:19.010000", '
-                            '"__class__": "Review"}}')
-                self.assertEqual(expected, cont)
+        b = BaseModel()
+        u = User()
+        c = City()
+        s = State()
+        p = Place()
+        a = Amenity()
+        r = Review()
+        storage.save()
+        self.assertEqual(os.path.isfile(
+            PATH) and os.access(PATH, os.R_OK), True)
+        cont = self.write_file(PATH)
+        key = "{:s}.{:s}".format(
+            b.__class__.__name__, b.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            u.__class__.__name__, u.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            c.__class__.__name__, c.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            s.__class__.__name__, s.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            p.__class__.__name__, p.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            a.__class__.__name__, a.id)
+        self.assertIn(key, cont)
+        key = "{:s}.{:s}".format(
+            r.__class__.__name__, r.id)
+        self.assertIn(key, cont)
         with self.assertRaises(TypeError):
             storage.save(2)
         with self.assertRaises(TypeError):
