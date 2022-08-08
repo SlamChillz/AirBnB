@@ -7,9 +7,9 @@ from unittest.mock import patch
 from models import storage
 import os
 from datetime import datetime
-from io import StringIO
-import uuid
+from models.engine.file_storage import FileStorage
 import models.base_model
+import uuid
 from models.user import User
 from models.city import City
 from models.state import State
@@ -25,13 +25,26 @@ class TestFileStorage(unittest.TestCase):
     """
 
     def setUp(self):
+        FileStorage._FileStorage__objects = {}
         storage._FileStorage__objects = {}
+
+    def test_file_storage(self):
+        """
+        Test the FileStorage class all method
+        """
+        with self.assertRaises(TypeError):
+            fs = FileStorage(2)
+        with self.assertRaises(TypeError):
+            fs = FileStorage("foo")
+        with self.assertRaises(TypeError):
+            fs = FileStorage(None)
 
     def test_all(self):
         """
         Test the FileStorage class all method
         """
         self.assertEqual(storage.all(), {})
+        self.assertEqual(type(storage.all()), dict)
         b = BaseModel()
         u = User()
         a = Amenity()
@@ -42,6 +55,8 @@ class TestFileStorage(unittest.TestCase):
             storage.all(2)
         with self.assertRaises(TypeError):
             storage.all('foo')
+        with self.assertRaises(TypeError):
+            storage.all(None)
 
     def test_new(self):
         """
@@ -185,6 +200,8 @@ class TestFileStorage(unittest.TestCase):
             storage.save(2)
         with self.assertRaises(TypeError):
             storage.save('foo')
+        with self.assertRaises(TypeError):
+            storage.save(None)
         os.remove(PATH)
 
     def test_reload(self):
@@ -201,12 +218,15 @@ class TestFileStorage(unittest.TestCase):
         r = Review()
         storage.save()
         storage.reload()
-        for k, v in storage.all().items():
+        store = FileStorage._FileStorage__objects
+        for k, v in store.items():
             self.assertTrue(isinstance(v, BaseModel))
         with self.assertRaises(TypeError):
             storage.reload(2)
         with self.assertRaises(TypeError):
             storage.reload('foo')
+        with self.assertRaises(TypeError):
+            storage.reload(None)
         os.remove(PATH)
 
         if os.path.isfile(
