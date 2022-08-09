@@ -28,6 +28,7 @@ class TestFileStorage(unittest.TestCase):
         """
         Test the FileStorage class all method
         """
+        self.assertEqual(FileStorage._FileStorage__objects, {})
         self.assertTrue(hasattr(storage, '_FileStorage__objects'))
         self.assertFalse(hasattr(storage, '__objects'))
         self.assertEqual(type(FileStorage._FileStorage__objects), dict)

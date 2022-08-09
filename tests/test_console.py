@@ -26,6 +26,34 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 
+class TestConsole(unittest.TestCase):
+    """Test 'help', 'quit', 'EOF' and  empty line'"""
+
+    def test_help(self):
+        ideal = ("Documented commands (type help <topic>):\n"
+                 "========================================\n"
+                 "EOF  all  count  create  destroy  help  quit  show  update")
+        with patch("sys.stdout", new=StringIO()) as f:
+            CMD().onecmd("help")
+            self.assertEqual(f.getvalue().strip(), ideal)
+
+    def test_quit(self):
+        """test quit"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.assertTrue(CMD().onecmd("quit"))
+
+    def test_EOF(self):
+        """test EOF"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.assertTrue(CMD().onecmd("EOF"))
+
+    def test_empty_line(self):
+        """test empty line"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            CMD().onecmd("")
+            self.assertEqual(f.getvalue().strip(), "")
+
+
 class TestCreateCommand(unittest.TestCase):
     """
     Tests for create command
