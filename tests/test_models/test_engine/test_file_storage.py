@@ -189,6 +189,8 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class save method
         """
         PATH = 'file.json'
+        storage.reload()
+        self.assertEqual(FileStorage._FileStorage__objects, {})
         b = BaseModel()
         u = User()
         c = City()
