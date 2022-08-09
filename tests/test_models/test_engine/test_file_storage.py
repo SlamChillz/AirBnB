@@ -32,6 +32,8 @@ class TestFileStorage(unittest.TestCase):
         self.assertFalse(hasattr(storage, '__objects'))
         self.assertEqual(type(FileStorage._FileStorage__objects), dict)
         self.assertEqual(type(storage), FileStorage)
+        with self.assertRaises(AttributeError):
+            print(storage.__objects)
         with self.assertRaises(TypeError):
             fs = FileStorage(2)
         with self.assertRaises(TypeError):
