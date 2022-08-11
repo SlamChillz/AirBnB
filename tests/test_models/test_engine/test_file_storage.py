@@ -29,10 +29,14 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class all method
         """
         self.assertEqual(FileStorage._FileStorage__objects, {})
+        self.assertEqual(storage._FileStorage__objects, {})
         self.assertTrue(hasattr(storage, '_FileStorage__objects'))
         self.assertFalse(hasattr(storage, '__objects'))
         self.assertEqual(type(FileStorage._FileStorage__objects), dict)
+        self.assertEqual(type(storage._FileStorage__objects), dict)
         self.assertEqual(type(storage), FileStorage)
+        with self.assertRaises(AttributeError):
+            print(storage.__objects)
         with self.assertRaises(TypeError):
             fs = FileStorage(2)
         with self.assertRaises(TypeError):
@@ -187,6 +191,8 @@ class TestFileStorage(unittest.TestCase):
         Test the FileStorage class save method
         """
         PATH = 'file.json'
+        storage.reload()
+        self.assertEqual(FileStorage._FileStorage__objects, {})
         b = BaseModel()
         u = User()
         c = City()
@@ -196,9 +202,10 @@ class TestFileStorage(unittest.TestCase):
         r = Review()
         storage.save()
         storage.reload()
-        store = FileStorage._FileStorage__objects
+        store = storage._FileStorage__objects
         for k, v in store.items():
             self.assertTrue(isinstance(v, BaseModel))
+        self.assertIn(b.__class__.__name__ + '.' + b.id, store.keys())
         with self.assertRaises(TypeError):
             storage.reload(2)
         with self.assertRaises(TypeError):
