@@ -124,7 +124,10 @@ class HBNBCommand(cmd.Cmd):
             (None): if no parameters are valid and all set.
         """
         args = (args).replace("'", '"')
-        params = json.loads(args)
+        try:
+            params = json.loads(args)
+        except Exception:
+            params = {"None": "None"}
         for key, value in params.items():
             if key == "None":
                 return print('** attribute name missing **')
